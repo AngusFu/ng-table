@@ -1,33 +1,48 @@
 <button nz-button (click)="updateData()">refresh</button>
 <br />
 <br />
+
 <nz-table
   class="datatable"
   #virtualTable
   nzVirtualScroll
-  [nzVirtualItemSize]="54"
+  [nzVirtualItemSize]="40"
   [nzData]="listOfData"
   [nzFrontPagination]="false"
-  [nzShowPagination]="false"
-  [nzScroll]="{ x: tableWidth + 'px', y: '300px' }"
+  [nzShowPagination]="true"
+  [nzTotal]="1000000"
+  [nzPageSize]="100"
+  [nzPageIndex]="6"
+  [nzScroll]="{ x: tableWidth + 'px', y: 'calc(100vh - 200px)' }"
   [nzLoading]="tableLoading"
 >
-  <thead>
-    <tr>
+  <thead [nzSingleSort]="true" (nzSortChange)="onSortChange($event)">
+    <tr
+      cdkDropList
+      cdkDropListOrientation="horizontal"
+      (cdkDropListDropped)="onColumnHeaderDrop($event)"
+    >
       <th
-        *ngFor="let item of tableColumns"
-        [nzAlign]="'center'"
-        [nzWidth]="item.width + 'px'"
+        cdkDrag
+        *ngFor="let column of tableColumns; trackBy: trackByKey"
+        [nzWidth]="column.width + 'px'"
+        [nzAlign]="column.align || 'center'"
+        [nzShowSort]="column.sortable === 'custom'"
+        [nzSortKey]="column.key"
       >
-        {{ item.title }}
+        {{ column.title }}
       </th>
     </tr>
   </thead>
   <tbody>
     <ng-template nz-virtual-scroll let-data let-index="index">
       <tr>
-        <td *ngFor="let column of tableColumns" class="data-cell">
-          <div [style.width]="column.width - 32 + 'px'">
+        <td
+          *ngFor="let column of tableColumns; trackBy: trackByKey"
+          [nzAlign]="column.align || 'center'"
+          class="data-cell"
+        >
+          <div [style.width]="column.width - 16 + 'px'">
             <ng-container *ngIf="column.component; else elseTemplate">
               <ndc-dynamic
                 [ndcDynamicComponent]="column.component"
@@ -41,7 +56,7 @@
             </ng-container>
 
             <ng-template #elseTemplate>
-              {{ data[column.key] }}
+              {{ data[column.key] || "-" }}
             </ng-template>
           </div>
         </td>

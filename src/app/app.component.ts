@@ -3,9 +3,12 @@ import {
   Component,
   OnDestroy,
   OnInit,
-  ViewChild
+  ViewChild,
+  ViewEncapsulation
 } from "@angular/core";
 import { HttpClient, HttpHeaders } from "@angular/common/http";
+import { moveItemInArray, CdkDragDrop } from "@angular/cdk/drag-drop";
+
 import { NzTableComponent } from "ng-zorro-antd";
 import { Subject } from "rxjs";
 import { takeUntil } from "rxjs/operators";
@@ -20,7 +23,8 @@ const columns: any[] = YAML.parse(yamlContent).columns;
 @Component({
   selector: "app-root",
   templateUrl: "./app.component.html",
-  styleUrls: ["./app.component.scss"]
+  styleUrls: ["./app.component.scss"],
+  encapsulation: ViewEncapsulation.None
 })
 export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild("virtualTable", { static: true })
@@ -61,6 +65,18 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
     //     this.listOfData = res.data.lists;
     //     this.tableLoading = false;
     //   });
+  }
+
+  trackByKey(_index: number, item: any): string {
+    return item.key;
+  }
+
+  onSortChange(e: any): void {
+    console.log(e);
+  }
+
+  onColumnHeaderDrop(event: CdkDragDrop<string[]>): void {
+    moveItemInArray(this.tableColumns, event.previousIndex, event.currentIndex);
   }
 
   ngOnInit(): void {

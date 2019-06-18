@@ -1,7 +1,27 @@
-.datatable .data-cell {
-  text-align: center;
+.ant-table-thead > tr > th,
+.ant-table-tbody > tr > td {
+  padding: 4px 8px 5px !important;
+}
 
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+.data-cell {
+  & > div {
+    height: 30px;
+    line-height: 30px;
+
+    &,
+    & app-dyn-example > * {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+  }
+}
+th.cdk-drag-preview {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #f00;
+}
+.cdk-drag-preview .ant-table-column-sorter {
+  display: none;
 }
