@@ -1,4 +1,51 @@
-<!-- NG-ZORRO -->
-<a href="https://github.com/NG-ZORRO/ng-zorro-antd" target="_blank" style="display: flex;align-items: center;justify-content: center;height: 100%;width: 100%;">
-  <img height="300" src="https://img.alicdn.com/tfs/TB1X.qJJgHqK1RjSZFgXXa7JXXa-89-131.svg">
-</a>
+<button nz-button (click)="updateData()">refresh</button>
+<br />
+<br />
+<nz-table
+  class="datatable"
+  #virtualTable
+  nzVirtualScroll
+  [nzVirtualItemSize]="54"
+  [nzData]="listOfData"
+  [nzFrontPagination]="false"
+  [nzShowPagination]="false"
+  [nzScroll]="{ x: tableWidth + 'px', y: '300px' }"
+  [nzLoading]="tableLoading"
+>
+  <thead>
+    <tr>
+      <th
+        *ngFor="let item of tableColumns"
+        [nzAlign]="'center'"
+        [nzWidth]="item.width + 'px'"
+      >
+        {{ item.title }}
+      </th>
+    </tr>
+  </thead>
+  <tbody>
+    <ng-template nz-virtual-scroll let-data let-index="index">
+      <tr>
+        <td *ngFor="let column of tableColumns" class="data-cell">
+          <div [style.width]="column.width - 32 + 'px'">
+            <ng-container *ngIf="column.component; else elseTemplate">
+              <ndc-dynamic
+                [ndcDynamicComponent]="column.component"
+                [ndcDynamicInputs]="{
+                  cellValue: data[column.key],
+                  index: index,
+                  rowData: data,
+                  columnOption: column
+                }"
+              ></ndc-dynamic>
+            </ng-container>
+
+            <ng-template #elseTemplate>
+              {{ data[column.key] }}
+            </ng-template>
+          </div>
+        </td>
+      </tr>
+    </ng-template>
+  </tbody>
+</nz-table>
