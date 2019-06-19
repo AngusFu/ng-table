@@ -14,8 +14,8 @@ import { Subject } from "rxjs";
 import { takeUntil } from "rxjs/operators";
 
 import YAML from "./YAML";
-import yamlContent from "./demo";
-import fakeData from "./mock";
+import fake from "./fake";
+import yamlContent from "./columnConfigYaml";
 import { DynExampleComponent } from "./dyn-example/dyn-example.component";
 
 const columns: any[] = YAML.parse(yamlContent).columns;
@@ -29,18 +29,21 @@ const columns: any[] = YAML.parse(yamlContent).columns;
 export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild("virtualTable", { static: true })
   nzTableComponent: NzTableComponent;
-
   private destroy$ = new Subject();
-  listOfData: any[] = [];
 
-  tableColumns = columns.map(item => {
+  listOfData: any[] = [];
+  isLoading = false;
+  totalCount = 0;
+
+  pageSize = 100;
+
+  columnOptions = columns.map(item => {
     if (Math.random() > 0.6) {
       return { ...item, component: DynExampleComponent };
     }
     return item;
   });
-  tableWidth = columns.reduce((acc, col) => acc + col.width, 0);
-  tableLoading = false;
+  horizontalWidth = columns.reduce((acc, col) => acc + col.width, 0);
 
   constructor(private http: HttpClient) {}
 
@@ -49,7 +52,13 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   updateData() {
-    // this.tableLoading = true;
+    this.isLoading = true;
+    setTimeout(() => {
+      this.isLoading = false;
+      this.listOfData = fake(columns, 10e3);
+      this.totalCount = 10e8;
+      console.log('done')
+    }, 500)
     // this.http
     //   .post(
     //     "",
@@ -61,9 +70,10 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
     //       withCredentials: true
     //     }
     //   )
-    //   .subscribe((res: { data: { lists: any[] } }) => {
+    //   .subscribe((res: { data: { lists: any[]; total: number } }) => {
+    //     this.isLoading = false;
     //     this.listOfData = res.data.lists;
-    //     this.tableLoading = false;
+    //     this.totalCount = res.data.total;
     //   });
   }
 
@@ -71,16 +81,45 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
     return item.key;
   }
 
-  onSortChange(e: any): void {
+  onPaginationChange(e: any): void {
+    console.log(e);
+  }
+
+  onSortChange(e: { key: string; value: "descend" | "ascend" | null }): void {
     console.log(e);
   }
 
   onColumnHeaderDrop(event: CdkDragDrop<string[]>): void {
-    moveItemInArray(this.tableColumns, event.previousIndex, event.currentIndex);
+    moveItemInArray(
+      this.columnOptions,
+      event.previousIndex,
+      event.currentIndex
+    );
+  }
+  reorder() {
+    this.columnOptions = this.columnOptions.slice(3, 10);
   }
 
+  //  onPageSizeChange(pageSize) {
+  //     // 注意对 pageIndex 进行校正
+  //    const maxPageIndex = Math.ceil(this.totalCount / pageSize)
+  //     const pageIndex = Math.min(maxPageIndex, this.pageIndex) || 1
+  //     this.localDispatch('setPagination', { pageIndex, pageSize })
+  //     // 存储自定义的 pageSize
+  //     this.$idleTaskQue.add(
+  //       () => {
+  //         this.$forage.setItem(this.pageSizeStoreKey, pageSize)
+  //       },
+  //       { timeout: 2000 }
+  //     )
+  //   },
+
+  //  onPageIndexChange(pageIndex) {
+  //     this.localDispatch('setPagination', { pageIndex })
+  //   },
+
   ngOnInit(): void {
-    this.listOfData = fakeData.data.lists;
+    this.updateData();
   }
 
   ngAfterViewInit(): void {

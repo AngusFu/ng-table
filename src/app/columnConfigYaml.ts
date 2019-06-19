@@ -1,5 +1,5 @@
 export default `config:
-  base: /ultron-instance_qiyun/api/v1
+  base: /api
   listPath: /server/list
   exportPath: /server/export
   method: POST
