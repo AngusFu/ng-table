@@ -1,5 +1,5 @@
 <button nz-button (click)="updateData()">refresh</button>
-<button nz-button (click)="reorder()">reorder</button>
+<button nz-button (click)="changeColumn()">changeColumn</button>
 <br />
 <br />
 
@@ -13,10 +13,10 @@
   [nzFrontPagination]="false"
   [nzShowPagination]="true"
   [nzShowSizeChanger]="true"
-  [nzPageSizeOptions]="[10, 20, 50, 100, 200]"
   [nzTotal]="totalCount"
   [nzPageSize]="pageSize"
-  [nzPageIndex]="1"
+  [nzPageIndex]="pageIndex"
+  [nzPageSizeOptions]="pageSizeOptions"
   [nzScroll]="{ x: horizontalWidth + 'px', y: 'calc(100vh - 200px)' }"
   (nzPageIndexChange)="onPaginationChange({ pageIndex: $event })"
   (nzPageSizeChange)="onPaginationChange({ pageSize: $event })"

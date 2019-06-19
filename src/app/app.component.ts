@@ -10,7 +10,7 @@ import { HttpClient, HttpHeaders } from "@angular/common/http";
 import { moveItemInArray, CdkDragDrop } from "@angular/cdk/drag-drop";
 
 import { NzTableComponent } from "ng-zorro-antd";
-import { Subject } from "rxjs";
+import { Subject, Observable } from "rxjs";
 import { takeUntil } from "rxjs/operators";
 
 import YAML from "./YAML";
@@ -36,6 +36,8 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
   totalCount = 0;
 
   pageSize = 100;
+  pageSizeOptions = [10, 20, 50, 100, 200];
+  pageIndex = 1;
 
   columnOptions = columns.map(item => {
     if (Math.random() > 0.6) {
@@ -43,7 +45,10 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
     }
     return item;
   });
-  horizontalWidth = columns.reduce((acc, col) => acc + col.width, 0);
+
+  get horizontalWidth(): number {
+    return this.columnOptions.reduce((acc, col) => acc + col.width, 0);
+  }
 
   constructor(private http: HttpClient) {}
 
@@ -55,10 +60,10 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
     this.isLoading = true;
     setTimeout(() => {
       this.isLoading = false;
-      this.listOfData = fake(columns, 10e3);
+      this.listOfData = fake(columns, 500);
       this.totalCount = 10e8;
-      console.log('done')
-    }, 500)
+      console.log("done");
+    }, 200);
     // this.http
     //   .post(
     //     "",
@@ -96,8 +101,9 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
       event.currentIndex
     );
   }
-  reorder() {
-    this.columnOptions = this.columnOptions.slice(3, 10);
+
+  changeColumn() {
+    this.columnOptions = this.columnOptions.slice(1);
   }
 
   //  onPageSizeChange(pageSize) {
